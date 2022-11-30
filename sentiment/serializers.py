@@ -6,4 +6,4 @@ from .forms import InputStringForm
 class InputStringSerializer(serializers.ModelSerializer):
     class Meta:
         model = InputString
-        fields = ['body']
+        fields = ['body', 'sentiment']

@@ -1,11 +1,13 @@
 from rest_framework.response import Response
+from rest_framework import generics
 from .serializers import InputStringSerializer
 from .forms import InputStringForm
 from rest_framework import renderers
 from rest_framework.views import APIView
 from .process import reconstructed_model, preprocess
-from django.shortcuts import redirect, reverse
 from django.http import HttpResponseRedirect
+from .models import InputString
+from rest_framework.permissions import IsAdminUser
 
 # class SentimentViewList(generics.ListCreateAPIView):
 #    serializer_class = InputStringSerializer
@@ -28,7 +30,8 @@ class SentimentView(APIView):
     sentiments = ["Negative", "Positive", "Neutral"]
 
     def get(self, request):
-        pass
+
+        return Response({"Sentiment Type": "None"})
 
     def post(self, request):
         input = request.data.get('body')
@@ -38,10 +41,20 @@ class SentimentView(APIView):
             processed_input = preprocess(input)
             output = reconstructed_model.predict(processed_input)
             sentiment_index = output.argmax()
-            return Response({"Sentiment Type": self.sentiments[sentiment_index]})
+            # Save for List View
+            obj = InputString.objects.create(body=input, sentiment=self.sentiments[sentiment_index])
 
-        # serializer = InputStringSerializer(input, data=request.data)
-        # if not serializer.is_valid():
-        #     return Response({'serializer': serializer})
-        # serializer.save()
-        # return redirect('sentiment-home')
+            return Response({"Sentiment Type": self.sentiments[sentiment_index]})
+        return Response({"Sentiment Type": "None"})
+
+
+class SentimentListView(generics.ListAPIView):
+    queryset = InputString.objects.all()
+    serializer_class = InputStringSerializer
+    permission_classes = [IsAdminUser]
+
+# serializer = InputStringSerializer(input, data=request.data)
+# if not serializer.is_valid():
+#     return Response({'serializer': serializer})
+# serializer.save()
+# return redirect('sentiment-home')

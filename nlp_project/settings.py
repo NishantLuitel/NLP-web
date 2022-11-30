@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     # 3rd Party
     "rest_framework",
 
+
+
     # Local
     "accounts.apps.AccountsConfig",
     "pages.apps.PagesConfig",
     "sentiment.apps.SentimentConfig",
+    "n_gram.apps.NGramConfig",
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser"
