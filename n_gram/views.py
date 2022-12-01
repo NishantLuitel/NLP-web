@@ -2,18 +2,10 @@ from rest_framework.response import Response
 from .forms import InputStringForm
 from rest_framework import renderers
 from rest_framework.views import APIView
-from django.shortcuts import redirect, reverse
-
-# class SentimentViewList(generics.ListCreateAPIView):
-#    serializer_class = InputStringSerializer
-#    queryset = InputString.objects.all()
-# class SentimentViewList(generics.CreateAPIView):
-#    serializer_class = InputStringSerializer
-#    queryset = InputString.objects.all()
+from .process import suggest, preprocess
 
 
 class MyBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
-    # either
     def get_context(self, *args, **kwargs):
         context = super(MyBrowsableAPIRenderer, self).get_context(*args, **kwargs)
         context["post_form"] = InputStringForm()
@@ -22,20 +14,26 @@ class MyBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
 
 class NgramView(APIView):
     renderer_classes = [renderers.JSONRenderer, MyBrowsableAPIRenderer, ]
-    # sentiments = ["Negative", "Positive", "Neutral"]
+
+    def get(self, request):
+
+        return Response({"N_gram": "Probabilistic Model"})
 
     def post(self, request):
-        # input = request.data.get('body')
-        #
-        # form = InputStringForm(request.data)
-        # if form.is_valid():
-        #     processed_input = preprocess(input)
-        #     output = reconstructed_model.predict(processed_input)
-        #     sentiment_index = output.argmax()
-        return Response({"Sentiment Type": "Dummy"})
+        input = request.data.get('body')
+        if input == '':
+            print("Input String", input)
+        else:
+            print("All Fine:", input)
+        n_gram_index = request.data.get('n_from_ngram')
+        print(n_gram_index)
 
-        # serializer = InputStringSerializer(input, data=request.data)
-        # if not serializer.is_valid():
-        #     return Response({'serializer': serializer})
-        # serializer.save()
-        # return redirect('sentiment-home')
+        form = InputStringForm(request.data)
+        if form.is_valid():
+            print("true")
+            processed_input = preprocess(input)
+            print("processed_input:", input)
+            output = suggest(processed_input, [int(n_gram_index)])
+            print('Output:', output)
+            return Response({"Predicted Tokens": output})
+        return Response({"None": "None"})

@@ -44,7 +44,6 @@ INSTALLED_APPS = [
 
     # Local
     "accounts.apps.AccountsConfig",
-    "pages.apps.PagesConfig",
     "sentiment.apps.SentimentConfig",
     "n_gram.apps.NGramConfig",
 ]
