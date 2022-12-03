@@ -1,10 +1,8 @@
 import joblib
 from .ngram import nGramLangugageModel, preprocessText
 
-vocabulary = joblib.load(
-    'n_gram\\Nepali_Corpus\\vocabulary.pkl')
-n_gram_counts_list = joblib.load(
-    'n_gram\\Nepali_Corpus\\n_gram_counts_list.pkl')
+vocabulary = joblib.load('NLP_Trained_models/n_gram/Nepali_Corpus/vocabulary.pkl')
+n_gram_counts_list = joblib.load('NLP_Trained_models/n_gram/Nepali_Corpus/n_gram_counts_list.pkl')
 
 
 model = nGramLangugageModel()

@@ -4,18 +4,10 @@ from .serializers import InputStringSerializer
 from .forms import InputStringForm
 from rest_framework import renderers
 from rest_framework.views import APIView
-from .process import reconstructed_model, preprocess
+from .process import reconstructed_model, testOwnString
 from django.http import HttpResponseRedirect
 from .models import InputString
-from rest_framework.permissions import IsAdminUser
-
-# class SentimentViewList(generics.ListCreateAPIView):
-#    serializer_class = InputStringSerializer
-#    queryset = InputString.objects.all()
-# class SentimentViewList(generics.CreateAPIView):
-#    serializer_class = InputStringSerializer
-#    queryset = InputString.objects.all()
-
+from rest_framework.permissions import AllowAny
 
 class MyBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
     # either
@@ -24,37 +16,25 @@ class MyBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
         context["post_form"] = InputStringForm()
         return context
 
-
 class SentimentView(APIView):
+    permission_classes = [AllowAny]
     renderer_classes = [renderers.JSONRenderer, MyBrowsableAPIRenderer, ]
     sentiments = ["Negative", "Positive", "Neutral"]
 
-    def get(self, request):
-
-        return Response({"Sentiment Type": "None"})
-
     def post(self, request):
+        """
+            Sentimental Classification of the input string
+        """
         input = request.data.get('body')
-
         form = InputStringForm(request.data)
+        # check if the input string is valid
         if form.is_valid():
-            processed_input = preprocess(input)
-            output = reconstructed_model.predict(processed_input)
-            sentiment_index = output.argmax()
-            # Save for List View
+            # get the probabilities of the sentiments of the input string
+            probabilities = testOwnString(input)
+            sentiment_index = probabilities.argmax()
             obj = InputString.objects.create(body=input, sentiment=self.sentiments[sentiment_index])
 
             return Response({"Sentiment Type": self.sentiments[sentiment_index]})
         return Response({"Sentiment Type": "None"})
 
 
-class SentimentListView(generics.ListAPIView):
-    queryset = InputString.objects.all()
-    serializer_class = InputStringSerializer
-    permission_classes = [IsAdminUser]
-
-# serializer = InputStringSerializer(input, data=request.data)
-# if not serializer.is_valid():
-#     return Response({'serializer': serializer})
-# serializer.save()
-# return redirect('sentiment-home')

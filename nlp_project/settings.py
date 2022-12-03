@@ -39,9 +39,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # 3rd Party
     "rest_framework",
-
-
-
     # Local
     "accounts.apps.AccountsConfig",
     "sentiment.apps.SentimentConfig",
