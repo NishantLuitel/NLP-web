@@ -40,12 +40,10 @@ INSTALLED_APPS = [
     # 3rd Party
     "rest_framework",
     # Local
-    "accounts.apps.AccountsConfig",
     "sentiment.apps.SentimentConfig",
     "n_gram.apps.NGramConfig",
 ]
 
-AUTH_USER_MODEL = "accounts.CustomUser"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
