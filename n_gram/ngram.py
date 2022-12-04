@@ -1,136 +1,4 @@
-import math
-import random
-import numpy as np
-import pandas as pd
-import nltk
-import joblib
-
-# nltk.download('punkt')
-
-
-class preprocessText:
-
-    def __init__(self):
-        pass
-
-    def count_words(self, tokenized_sentences):
-        """
-        Count the number of word appearances in the tokenized sentences
-
-        Input :
-          tokenized_sentences : list of tokenized sentences
-
-        Output :
-          word_counts : dictionary with key = word and value = frequency of word in the list of tokenized sentences
-        """
-
-        word_counts = {}
-        for sentence in tokenized_sentences:
-            for token in sentence:
-                if token not in word_counts.keys():
-                    word_counts[token] = 1
-                else:
-                    word_counts[token] += 1
-
-        return word_counts
-
-    def get_words_with_nplus_frequency(self, tokenized_sentences, count_threshold):
-        """
-        Create the vocabulary such that the words are of certain minimum frequency in the training dataset
-
-        Input :
-          tokenized_sentences : list of tokenized sentences
-          count_threshold : minimum frequency for a word to be added in vocabulary
-
-        Ouput :
-          closed_vocab : list of words that has more that the minimum frequency
-        """
-        closed_vocab = []
-
-        word_counts = self.count_words(tokenized_sentences)
-
-        for word, cnt in word_counts.items():
-            if cnt >= count_threshold:
-                closed_vocab.append(word)
-
-        return closed_vocab
-
-    def replace_oov_words_by_unk(self, tokenized_sentences, vocabulary, unknown_token=""):
-        """
-        Replaced all the words in tokenized_sentences not in vocabulary by the unknown_token
-
-        Input :
-          tokenized_sentences : list of tokenized sentences
-          vocabulary : list of words => output from get_words_with_nplus_frequency()
-          unknown_token : symbol to replace the words absent in vocabulary
-
-        Output :
-          replaced_tokenized_sentences :  tokenized_sentences with words absent in vocabulary replaced by the "unknown_token"
-        """
-
-        vocabulary = set(vocabulary)
-
-        replaced_tokenized_sentences = []
-
-        for sentence in tokenized_sentences:
-            replaced_sentence = []
-
-            for token in sentence:
-                if token in vocabulary:
-                    replaced_sentence.append(token)
-                else:
-                    replaced_sentence.append(unknown_token)
-            replaced_tokenized_sentences.append(replaced_sentence)
-
-        return replaced_tokenized_sentences
-
-    def preprocess_data(self, train_data, test_data, count_threshold, unknown_token=""):
-        """
-        Preprocess the training and test data by replacing the words not in vocabulary by unknown_token
-
-        Input :
-          train_data : list of tokenized sentences of train_data
-          test_data : list of tokenized sentences of test_data
-          count_threshold : minimum frequency for a word to be added in vocabulary
-
-        Output :
-          train_data_replaced : preprocessed training data
-          test_data_replaced : preprocessed testing data
-          vocabulary : list of words => output from get_words_with_nplus_frequency()
-        """
-        vocabulary = self.get_words_with_nplus_frequency(train_data, count_threshold)
-
-        train_data_replaced = self.replace_oov_words_by_unk(
-            train_data, vocabulary, unknown_token=unknown_token)
-
-        test_data_replaced = self.replace_oov_words_by_unk(
-            test_data, vocabulary, unknown_token=unknown_token)
-
-        return train_data_replaced, test_data_replaced, vocabulary
-
-    def preprocess_sample(self, sample_data, vocabulary, unknown_token=""):
-        """
-        Preprocess the training and test data by replacing the words not in vocabulary by unknown_token
-
-        Input :
-          train_data : list of tokenized sentences of train_data
-          test_data : list of tokenized sentences of test_data
-          count_threshold : minimum frequency for a word to be added in vocabulary
-
-        Output :
-          train_data_replaced : preprocessed training data
-          test_data_replaced : preprocessed testing data
-          vocabulary : list of words => output from get_words_with_nplus_frequency()
-        """
-
-        sample_data_replaced = self.replace_oov_words_by_unk(
-            sample_data, vocabulary, unknown_token=unknown_token)
-
-        return sample_data_replaced
-
-
 class nGramLangugageModel:
-
     def __init__(self):
         pass
 
@@ -375,32 +243,29 @@ class nGramLangugageModel:
         for index in n_gram_index:
             tmp_suggest = self.suggest_words(
                 previous_tokens, n_gram_counts_list[index], n_gram_counts_list[index + 1], vocabulary, k=k, start_with=start_with, no_suggestions=no_suggestions)
-            print(f'n-gram-index = {index}')
-            print("=========================")
-            print(tmp_suggest)
-            print("=========================")
 
-    def return_suggestions(self, previous_tokens, vocabulary, n_gram_counts_list, n_gram_index, k=1.0, start_with=None, no_suggestions=3):
-        """
-        Display suggestion for the next word
+    def return_suggestions(self, previous_tokens, vocabulary, n_gram_counts_list, n_gram_index, k = 1.0, start_with = None, no_suggestions = 3):
+      """
+      Display suggestion for the next word
 
-        Input :
-          previous_tokens : given input words by the user
-          vocabulary : list of unique words in the training datasets
-          n_gram_counts_list : list of output of the count_n_gram functions for n-gram where n = 1, 2, 3, 4, 5
-          n_gram_index : index for the n-gram, where = 1 for unigram, = 2 for bigram and so on....
-          k : constant for k-smoothing
-          start_with : starting letters of the word to be suggested
-          no_suggestions : No. of suggestions provided for the next word
+      Input :
+        previous_tokens : given input words by the user
+        vocabulary : list of unique words in the training datasets
+        n_gram_counts_list : list of output of the count_n_gram functions for n-gram where n = 1, 2, 3, 4, 5
+        n_gram_index : index for the n-gram, where = 1 for unigram, = 2 for bigram and so on....
+        k : constant for k-smoothing
+        start_with : starting letters of the word to be suggested
+        no_suggestions : No. of suggestions provided for the next word
 
-        Output :
-          Display the suggested words
-        """
-        #print(f"The previous words are {previous_tokens}, the suggestions are:")
-        suggestions = []
-        for index in n_gram_index:
-            tmp_suggest = self.suggest_words(
-                previous_tokens, n_gram_counts_list[index], n_gram_counts_list[index + 1], vocabulary, k=k, start_with=start_with, no_suggestions=no_suggestions)
-            suggestions.append(tmp_suggest)
+      Output :
+        suggestions : no_suggestions * 2 suggest words list
+      """
+      suggestions = []
+      for index in n_gram_index:
+        tmp_suggest = self.suggest_words(previous_tokens, n_gram_counts_list[index], n_gram_counts_list[index + 1], vocabulary, k = k, start_with = start_with, no_suggestions = no_suggestions)
+        for suggest in tmp_suggest:
+          suggestions.append(suggest)
+      
+      suggestions.sort(key = lambda x : x[1], reverse = True)
 
-        return suggestions[0]
+      return suggestions[0:no_suggestions]
