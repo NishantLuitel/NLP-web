@@ -20,4 +20,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/sentiment-analysis/", include("sentiment.urls")),
     path("api/n-gram/", include("n_gram.urls")),
+    path("api/word-embedding/", include("word_embedding.urls")),
 ]
