@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "sentiment.apps.SentimentConfig",
     "n_gram.apps.NGramConfig",
     "word_embedding",
+    "transformer_lm",
 ]
 
 
