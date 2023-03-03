@@ -13,8 +13,10 @@ from torch.nn import TransformerEncoder, TransformerEncoderLayer
 def try_gpu(i=0):
     if torch.cuda.device_count() >= i+1:
         return torch.device(f'cuda:{i}')
+    
     return torch.device('cpu')
 
+# my_model = net.load_state_dict(torch.load('classifier.pt', map_location=torch.device('cpu')))
 
 device = try_gpu(0)
 
@@ -47,7 +49,7 @@ def batchify(data: Tensor, bsz: int) -> Tensor:
     return data.to(device)
 
 
-def get_batch(source: Tensor, i: int) -> tuple[Tensor, Tensor]:
+def get_batch(source: Tensor, i: int):
     """
     Args:
         source: Tensor, shape [full_seq_len, batch_size]
@@ -143,7 +145,7 @@ def generate_square_subsequent_mask(sz: int) -> Tensor:
 
 
 model.load_state_dict(torch.load(
-    'NLP_Trained_models/transformer_lm/best_model_3bigx3_corrected.pt'))
+    'NLP_Trained_models/transformer_lm/best_model_3bigx3_corrected.pt', map_location=torch.device('cpu')))
 model.to(device)
 best_model = model
 
