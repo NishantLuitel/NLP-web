@@ -8,6 +8,7 @@ from .process import reconstructed_model, testOwnString
 from django.http import HttpResponseRedirect
 from .models import InputString
 from rest_framework.permissions import AllowAny
+import numpy as np
 
 class MyBrowsableAPIRenderer(renderers.BrowsableAPIRenderer):
     # either
@@ -30,11 +31,12 @@ class SentimentView(APIView):
         # check if the input string is valid
         if form.is_valid():
             # get the probabilities of the sentiments of the input string
-            probabilities = testOwnString(input)
+            probabilities = testOwnString(input).flatten()
             sentiment_index = probabilities.argmax()
             obj = InputString.objects.create(body=input, sentiment=self.sentiments[sentiment_index])
 
-            return Response({"Sentiment Type": self.sentiments[sentiment_index]})
-        return Response({"Sentiment Type": "None"})
+            # return Response({"Sentiment Type": self.sentiments[sentiment_index]})
+            return Response({"probabilities": probabilities, "type": self.sentiments[sentiment_index]})
+        return Response({"error": "Form data is not valid"})
 
 
