@@ -22,4 +22,5 @@ urlpatterns = [
     path("api/n-gram/", include("n_gram.urls")),
     path("api/word-embedding/", include("word_embedding.urls")),
     path("api/transformer-lm/", include("transformer_lm.urls")),
+    path("api/spellchecker/", include("spellchecker.urls")),
 ]
