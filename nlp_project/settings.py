@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "n_gram.apps.NGramConfig",
     "word_embedding",
     "transformer_lm",
+    "spellchecker",
 ]
 
 
